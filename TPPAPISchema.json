@@ -1,0 +1,336 @@
+{
+    "openapi": "3.0.2",
+    "info": {
+        "title": "ADGM TPP Statistics Reporting",
+        "version": "1.0.0",
+        "description": "This specification sets out the summary statistics that a TPP must provide to ADGM.  The standard parameters are the start and end date for a period.  It requires the following items: i) users, split by individual/corporate and active/inactive - this lets ADGM compare TPPs by impact; ii) authentication, split by successful/rejected - this tells ADGM how active the TPP has been in the period; iii) calls per endpoint, split by successful/unsuccessful - this tells ADGM for each end point how active each has been; iv) latency per endpoint, split by maximum/average/minimum - this gives ADGM a sense for what the user experience is; v) downtime per endpoint, split by total/average/incidents - this gives ADGM a sense for how bad downtime has been."
+    },
+    "paths": {
+        "/authentication": {
+            "get": {
+                "description": "Get summary statistics on authentication by the TPP",
+                "parameters": [{
+                        "$ref": "#/components/parameters/startParam"
+                    },
+                    {
+                        "$ref": "#/components/parameters/endParam"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "$ref": "#/components/responses/200AuthenticationResponse"
+                    }
+                }
+            }
+        },
+        "/downtime": {
+            "get": {
+                "description": "Get summary statistics on the total downtime for the TPP's different API endpoints",
+                "parameters": [{
+                        "$ref": "#/components/parameters/startParam"
+                    },
+                    {
+                        "$ref": "#/components/parameters/endParam"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "$ref": "#/components/responses/200DowntimeResponse"
+                    }
+                }
+            }
+        },
+        "/latency": {
+            "get": {
+                "description": "Get summary statistics on the TPP's latency for different API endpoints",
+                "parameters": [{
+                        "$ref": "#/components/parameters/startParam"
+                    },
+                    {
+                        "$ref": "#/components/parameters/endParam"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK response",
+                        "$ref": "#/components/responses/200LatencyResponse"
+                    }
+                }
+            }
+        },
+        "/calls": {
+            "get": {
+                "description": "Gets summary statistics on the TPP's API calls",
+                "parameters": [{
+                        "$ref": "#/components/parameters/startParam"
+                    },
+                    {
+                        "$ref": "#/components/parameters/endParam"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "$ref": "#/components/responses/200CallsResponse"
+                    }
+                }
+            }
+        },
+        "/users": {
+            "get": {
+                "description": "Gets summary statistics on all TPP users",
+                "parameters": [{
+                        "$ref": "#/components/parameters/startParam"
+                    },
+                    {
+                        "$ref": "#/components/parameters/endParam"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "$ref": "#/components/schemas/users"
+                    }
+                }
+            }
+        }
+    },
+    "security": [{
+        "api_key": []
+    }],
+    "components": {
+        "securitySchemes": {
+            "api_key": {
+                "type": "apiKey",
+                "name": "api_key",
+                "in": "header"
+            }
+        },
+        "parameters": {
+            "startParam": {
+                "name": "start",
+                "in": "query",
+                "description": "Start date-time for the query.  If left blank, taken as 0:00 today",
+                "schema": {
+                    "type": "string",
+                    "format": "date-time"
+                }
+            },
+            "endParam": {
+                "name": "end",
+                "in": "query",
+                "description": "End date-time for the query.  If left blank, taken as now",
+                "schema": {
+                    "type": "string",
+                    "format": "date-time"
+                }
+            }
+        },
+        "responses": {
+            "200CallsResponse": {
+                "description": "Responds with summary statistics on calls",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/allCalls"
+                        }
+                    }
+                }
+            },
+            "200LatencyResponse": {
+                "description": "Responds with summary statistics on latency",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/allLatency"
+                        }
+                    }
+                }
+            },
+            "200DowntimeResponse": {
+                "description": "Responds with summary statistics on downtime",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/allDowntime"
+                        }
+                    }
+                }
+            },
+            "200AuthenticationResponse": {
+                "description": "Responds with summary statistics on authentication",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/allAuthentication"
+                        }
+                    }
+                }
+            }
+        },
+        "schemas": {
+            "endpointHeader": {
+                "type": "object",
+                "properties": {
+                    "endpoint": {
+                        "type": "string",
+                        "description": "The endpoint as defined by the TPP"
+                    },
+                    "start": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Start date for the response - should be the same as the parameter passed in"
+                    },
+                    "end": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "End date for the response - should be the same as the parameter passed in"
+                    }
+                }
+            },
+            "allCalls": {
+                "type": "array",
+                "description": "This array returns summary statistics on all calls to endpoints defined by a TPP.  It should return all endpoints that the TPP has implemented",
+                "items": {
+                    "$ref": "#/components/schemas/call"
+                }
+            },
+            "allLatency": {
+                "type": "array",
+                "description": "This array returns summary statistics on the latency of all endpoints defined by the TPP.  It should return all endpoints that the TPP has implemented",
+                "items": {
+                    "$ref": "#/components/schemas/latency"
+                }
+            },
+            "allDowntime": {
+                "type": "array",
+                "description": "This array returns summary statistics on the downtime of all endpoints defined by the TPP.  It should return all endpoints that the TPP has implemented",
+                "items": {
+                    "$ref": "#/components/schemas/downtime"
+                }
+            },
+            "allAuthentication": {
+                "type": "array",
+                "description": "This array returns summary statistics on authentication attempts on all endpoints defined by the TPP.  It should return all endpoints that the TPP has implemented",
+                "items": {
+                    "$ref": "#/components/schemas/authentication"
+                }
+            },
+            "call": {
+                "type": "object",
+                "properties": {
+                    "header": {
+                        "$ref": "#/components/schemas/endpointHeader"
+                    },
+                    "total": {
+                        "type": "integer",
+                        "description": "The total number of calls made to this endpoint in the period from start to end"
+                    },
+                    "successful": {
+                        "type": "integer",
+                        "description": "The total number of successful calls made to this endpoint in the period from start to end"
+                    },
+                    "failed": {
+                        "type": "integer",
+                        "description": "The total number of calls made to this endpoint that failed to be processed in the period from start to end"
+                    }
+                }
+            },
+            "latency": {
+                "type": "object",
+                "properties": {
+                    "header": {
+                        "$ref": "#/components/schemas/endpointHeader"
+                    },
+                    "minimum": {
+                        "type": "number",
+                        "description": "The minimum latency experienced by the endpoint in milliseconds during the period"
+                    },
+                    "maximum": {
+                        "type": "integer",
+                        "description": "The maximum latency experienced by the endpoint in milliseconds during the period"
+                    },
+                    "average": {
+                        "type": "integer",
+                        "description": "The average latency experienced by the endpoint in milliseconds during the period"
+                    }
+                }
+            },
+            "downtime": {
+                "type": "object",
+                "properties": {
+                    "header": {
+                        "$ref": "#/components/schemas/endpointHeader"
+                    },
+                    "total": {
+                        "type": "number",
+                        "description": "The total downtime experienced by the endpoint in milliseconds over the period"
+                    },
+                    "numberIncidents": {
+                        "type": "integer",
+                        "description": "The number of downtime incidents experienced by the endpoint over the period"
+                    },
+                    "average": {
+                        "type": "number",
+                        "description": "The average downtime experienced by the endpoint over the period"
+                    }
+                }
+            },
+            "authentication": {
+                "type": "object",
+                "properties": {
+                    "header": {
+                        "$ref": "#/components/schemas/endpointHeader"
+                    },
+                    "totalRequests": {
+                        "type": "integer",
+                        "description": "The total number of requests for authentication experienced by the endpoint over the period"
+                    },
+                    "successfulRequests": {
+                        "type": "integer",
+                        "description": "The total number of successful requests for authentication experienced by the endpoint over the period"
+                    },
+                    "failedRequests": {
+                        "type": "integer",
+                        "description": "The total number of failed requests for authentication experienced by the endpoint over the period"
+                    }
+                }
+            },
+            "users": {
+                "type": "object",
+                "properties": {
+                    "totalUsers": {
+                        "type": "integer",
+                        "description": "The total number of users registered by the TPP in this period"
+                    },
+                    "naturalUsers": {
+                        "type": "integer",
+                        "description": "The total number of natural persons registered as users by the TPP in the period"
+                    },
+                    "corporateUsers": {
+                        "type": "integer",
+                        "description": "The total number of corporate persons registered as users by the TPP in the period"
+                    },
+                    "activeNaturalUsers": {
+                        "type": "integer",
+                        "description": "The total number of active natural users (i.e. called at least one endpoint) in the period"
+                    },
+                    "inactiveNaturalUsers": {
+                        "type": "integer",
+                        "description": "The total number of inactive natural users (i.e. did not call any endpoints) in the period"
+                    },
+                    "activeCorporateUsers": {
+                        "type": "integer",
+                        "description": "The total number of active corporate users (i.e. called at least one endpoint) in the period"
+                    },
+                    "inactiveCorporateUsers": {
+                        "type": "integer",
+                        "description": "The total number of inactive corporate users (i.e. did not call any endpoints) in the period"
+                    }
+                }
+            }
+        }
+    }
+}
