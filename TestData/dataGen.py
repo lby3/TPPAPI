@@ -152,3 +152,4 @@ for endpoint in endpoints:
 
     testData = pd.DataFrame(generateDowntime())
     testData.to_csv('testdata/'+endpoint+'_downtime.csv')
+    
